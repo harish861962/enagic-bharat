@@ -37,8 +37,9 @@ router.post("/contact", async (req, res) => {
     // });
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
+  port: 465,
+  secure: true,
+  family: 4,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -73,14 +74,6 @@ await transporter.sendMail({
       message: "Email Sent Successfully",
     });
 
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({
-//       success: false,
-//       message: "Email Failed",
-//     });
-//   }
-// });
 
 } catch (err) {
   console.error("EMAIL ERROR");
