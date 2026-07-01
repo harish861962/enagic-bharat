@@ -5,15 +5,52 @@ const router = express.Router();
 
 router.post("/contact", async (req, res) => {
   const { name, email, phone, city, message, pincode , timeSlot } = req.body;
+    console.log("API HIT");
+    console.log(req.body);
+
+  if (!name || !email || !phone || !city || !message || !pincode || !timeSlot) {
+    return res.status(400).json({
+      success: false,
+      message: "Please fill all required fields",
+    });
+  }
+
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    return res.status(500).json({
+      success: false,
+      message: "Email service is not configured",
+    });
+  }
+
+  
 
   try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
+    // const transporter = nodemailer.createTransport({
+    //   service: "gmail",
+    //   connectionTimeout: 10000,
+    //   greetingTimeout: 10000,
+    //   socketTimeout: 15000,
+    //   auth: {
+    //     user: process.env.EMAIL_USER,
+    //     pass: process.env.EMAIL_PASS,
+    //   },
+    // });
+
+   const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+  tls: {
+    rejectUnauthorized: false,
+  },
+});
+await transporter.verify();
+
+console.log("SMTP Connected");
 
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
@@ -36,13 +73,26 @@ router.post("/contact", async (req, res) => {
       message: "Email Sent Successfully",
     });
 
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      success: false,
-      message: "Email Failed",
-    });
-  }
-});
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({
+//       success: false,
+//       message: "Email Failed",
+//     });
+//   }
+// });
+
+} catch (err) {
+  console.error("EMAIL ERROR");
+  console.error("Message:", err.message);
+  console.error("Code:", err.code);
+  console.error(err);
+
+  res.status(500).json({
+    success: false,
+    message: err.message,
+    code: err.code,
+  });
+}});
 
 module.exports = router;
