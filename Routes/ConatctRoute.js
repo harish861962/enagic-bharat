@@ -48,10 +48,12 @@ const transporter = nodemailer.createTransport({
 await transporter.verify();
 console.log("SMTP Connected");
 
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: "fakeid1266@gmail.com",
-      subject: "New Contact Form Submission",
+    console.log("Before sendMail");
+
+await transporter.sendMail({
+  from: process.env.EMAIL_USER,
+  to: "fakeid1266@gmail.com",
+  subject: "New Contact Form Submission",
       html: `
         <h2>New Contact Request</h2>
         <p><strong>Name:</strong> ${name}</p>
@@ -63,6 +65,8 @@ console.log("SMTP Connected");
         <p><strong>Time Slot:</strong> ${timeSlot}</p>
       `,
     });
+
+    console.log("After sendMail");
 
     res.json({
       success: true,
@@ -82,9 +86,9 @@ console.log("SMTP Connected");
   console.error("EMAIL ERROR");
   console.error("Message:", err.message);
   console.error("Code:", err.code);
-  console.error(err);
+  console.error(err.stack);
 
-  res.status(500).json({
+  return res.status(500).json({
     success: false,
     message: err.message,
     code: err.code,
