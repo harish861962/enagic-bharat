@@ -90,16 +90,6 @@ const nodemailer = require("nodemailer");
 
 const router = express.Router();
 
-const requiredEnv = ["BREVO_USER", "BREVO_PASS"];
-
-const escapeHtml = (value = "") =>
-  String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-
 router.post("/contact", async (req, res) => {
   const {
     name,
@@ -114,6 +104,7 @@ router.post("/contact", async (req, res) => {
   console.log("API HIT");
   console.log(req.body);
 
+  // Validation
   if (
     !name ||
     !email ||
@@ -128,20 +119,14 @@ router.post("/contact", async (req, res) => {
       message: "Please fill all required fields",
     });
   }
+if (!process.env.BREVO_USER || !process.env.BREVO_PASS) {
+  return res.status(500).json({
+    success: false,
+    message: "Brevo SMTP is not configured",
+  });
+}
 
-  const missingEnv = requiredEnv.filter((key) => !process.env[key]);
-  if (missingEnv.length) {
-    console.error("Missing email env:", missingEnv.join(", "));
 
-    return res.status(500).json({
-      success: false,
-      message: "Brevo SMTP is not configured",
-      missing: missingEnv,
-    });
-  }
-
-  const fromEmail = process.env.MAIL_FROM || process.env.BREVO_USER;
-  const toEmail = process.env.MAIL_TO || "fakeid1266@gmail.com";
 
   try {
     const transporter = nodemailer.createTransport({
@@ -157,17 +142,9 @@ router.post("/contact", async (req, res) => {
     await transporter.verify();
     console.log("SMTP Connected");
 
-    const safeName = escapeHtml(name);
-    const safeEmail = escapeHtml(email);
-    const safePhone = escapeHtml(phone);
-    const safeCity = escapeHtml(city);
-    const safePincode = escapeHtml(pincode);
-    const safeTimeSlot = escapeHtml(timeSlot);
-    const safeMessage = escapeHtml(message);
-
     const info = await transporter.sendMail({
-      from: `"Enagic Bharat" <${fromEmail}>`,
-      to: toEmail,
+      from: `"Enagic Bharat" <${process.env.BREVO_USER}>`,
+      to: "fakeid1266@gmail.com",
       replyTo: email,
       subject: "New Contact Form Submission",
 
@@ -177,37 +154,37 @@ router.post("/contact", async (req, res) => {
         <table border="1" cellpadding="8" cellspacing="0">
           <tr>
             <td><b>Name</b></td>
-            <td>${safeName}</td>
+            <td>${name}</td>
           </tr>
 
           <tr>
             <td><b>Email</b></td>
-            <td>${safeEmail}</td>
+            <td>${email}</td>
           </tr>
 
           <tr>
             <td><b>Phone</b></td>
-            <td>${safePhone}</td>
+            <td>${phone}</td>
           </tr>
 
           <tr>
-            <td><b>Address</b></td>
-            <td>${safeCity}</td>
+            <td><b>City</b></td>
+            <td>${city}</td>
           </tr>
 
           <tr>
             <td><b>Pincode</b></td>
-            <td>${safePincode}</td>
+            <td>${pincode}</td>
           </tr>
 
           <tr>
             <td><b>Time Slot</b></td>
-            <td>${safeTimeSlot}</td>
+            <td>${timeSlot}</td>
           </tr>
 
           <tr>
             <td><b>Message</b></td>
-            <td>${safeMessage}</td>
+            <td>${message}</td>
           </tr>
 
         </table>
@@ -227,7 +204,7 @@ router.post("/contact", async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: err.response || err.message || "Email send failed",
+      message: err.message,
       code: err.code,
     });
   }
