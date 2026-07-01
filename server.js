@@ -25,9 +25,8 @@ app.use("/api", require("./Routes/ConatctRoute")); // path apne project ke hisaa
 // app.use("/api", require("./Routes/ContactRoute.js"));
 
 const PORT = process.env.PORT || 5000;
-console.log("EMAIL_USER:", process.env.EMAIL_USER);
-console.log("EMAIL_PASS:", process.env.EMAIL_PASS ? "Loaded" : "Missing");
-
+console.log("BREVO_USER:", process.env.BREVO_USER);
+console.log("BREVO_PASS:", process.env.BREVO_PASS ? "Loaded" : "Missing");
 app.listen(PORT, () => {
   console.log(`Server Running on Port ${PORT}`);
 });
