@@ -27,6 +27,9 @@ app.use("/api", require("./Routes/ConatctRoute")); // path apne project ke hisaa
 const PORT = process.env.PORT || 5000;
 console.log("BREVO_USER:", process.env.BREVO_USER);
 console.log("BREVO_PASS:", process.env.BREVO_PASS ? "Loaded" : "Missing");
+
+console.log("BREVO_USER:", process.env.BREVO_USER);
+console.log("BREVO_PASS:", process.env.BREVO_PASS ? "Loaded" : "Missing");
 app.listen(PORT, () => {
   console.log(`Server Running on Port ${PORT}`);
 });
