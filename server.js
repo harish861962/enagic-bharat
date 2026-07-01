@@ -60,7 +60,9 @@ app.get("/", (req, res) => {
   });
 });
 
-app.use("/api", require("./Routes/ContactRoute"));
+// app.use("/api", require("./Routes/ContactRoute"));
+app.use("/api", require("./Routes/ConatctRoute")); // path apne project ke hisaab se
+
 
 const PORT = process.env.PORT || 5000;
 
