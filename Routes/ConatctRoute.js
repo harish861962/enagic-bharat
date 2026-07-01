@@ -25,24 +25,13 @@ router.post("/contact", async (req, res) => {
   
 
   try {
-    // const transporter = nodemailer.createTransport({
-    //   service: "gmail",
-    //   connectionTimeout: 10000,
-    //   greetingTimeout: 10000,
-    //   socketTimeout: 15000,
-    //   auth: {
-    //     user: process.env.EMAIL_USER,
-    //     pass: process.env.EMAIL_PASS,
-    //   },
-    // });
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  family: 4,
+  host: "smtp-relay.brevo.com",
+  port: 587,
+  secure: false,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: process.env.BREVO_USER,
+    pass: process.env.BREVO_PASS,
   },
 });
 
@@ -52,20 +41,25 @@ console.log("SMTP Connected");
     console.log("Before sendMail");
 
 await transporter.sendMail({
-  from: process.env.EMAIL_USER,
+  from: `"Enagic Bharat" <${process.env.BREVO_USER}>`,
   to: "fakeid1266@gmail.com",
+  replyTo: email,
   subject: "New Contact Form Submission",
-      html: `
-        <h2>New Contact Request</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Address:</strong> ${city}</p>
-        <p><strong>Mobile:</strong> ${phone}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Message:</strong> ${message}</p>
-        <p><strong>Pincode:</strong> ${pincode}</p>
-        <p><strong>Time Slot:</strong> ${timeSlot}</p>
-      `,
-    });
+  html: `
+    <h2>New Contact Request</h2>
+
+    <p><b>Name:</b> ${name}</p>
+    <p><b>Email:</b> ${email}</p>
+    <p><b>Phone:</b> ${phone}</p>
+    <p><b>City:</b> ${city}</p>
+    <p><b>Pincode:</b> ${pincode}</p>
+    <p><b>Time Slot:</b> ${timeSlot}</p>
+
+    <hr>
+
+    <p>${message}</p>
+  `,
+});
 
     console.log("After sendMail");
 
