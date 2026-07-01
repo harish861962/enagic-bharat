@@ -35,8 +35,7 @@ router.post("/contact", async (req, res) => {
     //     pass: process.env.EMAIL_PASS,
     //   },
     // });
-
-   const transporter = nodemailer.createTransport({
+const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
   secure: false,
@@ -44,12 +43,9 @@ router.post("/contact", async (req, res) => {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
-  tls: {
-    rejectUnauthorized: false,
-  },
 });
-await transporter.verify();
 
+await transporter.verify();
 console.log("SMTP Connected");
 
     await transporter.sendMail({
